@@ -1,3 +1,5 @@
+'use client'
+
 import { toast } from '@/hooks/use-toast';
 import config from '@/lib/config'
 import { cn } from '@/lib/utils';
@@ -50,7 +52,7 @@ const FileUpload = ({
   onFileChange,
   value
 }: Props) => {
-
+  
   const ikUploadRef = useRef(null);
   const [ file, setFile ] = useState<{ filePath: string | null }>({
     filePath: value ?? null
@@ -181,7 +183,8 @@ const FileUpload = ({
             controls={true}
             className="h-96 w-full rounded-xl"
           />
-        ) : null)}
+        ) : null
+      )}
     </ImageKitProvider>
   )
 }

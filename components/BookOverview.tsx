@@ -1,12 +1,16 @@
 import React from 'react'
 import Image from 'next/image'
 import BookCover from './BookCover';
+import { db } from '@/database/drizzle';
+import { users } from '@/database/schema';
+import { eq } from 'drizzle-orm';
+import BorrowBook from './BorrowBook';
 
 interface Props extends Book {
     userId: string
 }
 
-const BookOverview = ({ 
+const BookOverview = async ({ 
     title, 
     author, 
     genre, 
@@ -14,12 +18,24 @@ const BookOverview = ({
     totalCopies, 
     availableCopies,
     description,
-    cover,
-    color,
+    coverColor,
+    coverUrl,
     id,
     userId
 }: Props) => {
-    const user = false;
+    const [user] = await db
+        .select()
+        .from(users)
+        .where(eq(users.id, userId))
+        .limit(1)
+
+    const borrowingEligibility = {
+        isEligible: availableCopies > 0 && user?.status === 'APPROVED',
+        message: 
+            availableCopies <= 0
+                ? "Book not available"
+                : "You are not approved to borrow this book"
+    }
   return (
     <section className="book-overview">
         <div className="flex flex-1 flex-col gap-5">
@@ -56,9 +72,11 @@ const BookOverview = ({
             </p>
 
             {user && (
-                <div>
-                    Borrow Book
-                </div>
+                <BorrowBook 
+                    bookId={id}
+                    userId={userId}
+                    borrowingEligibility={borrowingEligibility}
+                />
             )}
         </div>
 
@@ -67,15 +85,15 @@ const BookOverview = ({
                 <BookCover 
                     variant="wide"
                     className="z-10"
-                    coverColor={color}
-                    coverImage={cover}
+                    coverColor={coverColor}
+                    coverImage={coverUrl}
                 />
 
                 <div className="absolute left-16 top-10 rotate-12 opacity-40 max-sm:hidden">
                     <BookCover 
                         variant="wide"
-                        coverColor={color}
-                        coverImage={cover}
+                        coverColor={coverColor}
+                        coverImage={coverUrl}
                     />
                 </div>
             </div>

@@ -5,12 +5,13 @@ import { sampleBooks } from '@/constants';
 import React from 'react'
 
 const Profile = () => {
+
+    
   return (
     <>
         <form
             action={async () => {
                 "use server";
-
                 await signOut();
             }}
             className="mb-10"
